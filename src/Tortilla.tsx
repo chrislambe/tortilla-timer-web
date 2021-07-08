@@ -1,5 +1,7 @@
 import { Box } from "@material-ui/core";
 import React, { useEffect, useMemo, useState } from "react";
+import useSound from "use-sound";
+import alertSound from "./alert.mp3";
 
 enum Phase {
   First,
@@ -10,12 +12,14 @@ export function Tortilla() {
   const [phase, setPhase] = useState<Phase>();
   const [timeRemaining, setTimeRemaining] = useState<number>();
 
+  const [playAlert] = useSound(alertSound);
+
   const endTime = useMemo(() => {
     switch (phase) {
       case Phase.First:
-        return Date.now() + 60000;
+        return Date.now() + 6000;
       case Phase.Second:
-        return Date.now() + 45000;
+        return Date.now() + 4500;
       default:
         return undefined;
     }
@@ -50,6 +54,12 @@ export function Tortilla() {
       setTimeRemaining(undefined);
     }
   }, [endTime]);
+
+  useEffect(() => {
+    if (timeRemaining === 0) {
+      playAlert();
+    }
+  }, [playAlert, timeRemaining]);
 
   return (
     <Box
