@@ -17,9 +17,9 @@ export function Tortilla() {
   const endTime = useMemo(() => {
     switch (phase) {
       case Phase.First:
-        return Date.now() + 6000;
+        return Date.now() + 60000;
       case Phase.Second:
-        return Date.now() + 4500;
+        return Date.now() + 45000;
       default:
         return undefined;
     }
