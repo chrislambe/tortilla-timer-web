@@ -1,4 +1,4 @@
-import { Box } from "@material-ui/core";
+import { Box, Stack, Typography, useTheme } from "@material-ui/core";
 import React, { useEffect, useMemo, useState } from "react";
 import useSound from "use-sound";
 import alertSound from "./alert.mp3";
@@ -9,6 +9,8 @@ enum Phase {
 }
 
 export function Tortilla() {
+  const { palette } = useTheme();
+
   const [phase, setPhase] = useState<Phase>();
   const [timeRemaining, setTimeRemaining] = useState<number>();
 
@@ -17,9 +19,9 @@ export function Tortilla() {
   const endTime = useMemo(() => {
     switch (phase) {
       case Phase.First:
-        return Date.now() + 60000;
+        return Date.now() + 2000;
       case Phase.Second:
-        return Date.now() + 45000;
+        return Date.now() + 2000;
       default:
         return undefined;
     }
@@ -34,13 +36,21 @@ export function Tortilla() {
   const side = useMemo(() => {
     switch (phase) {
       case Phase.First:
-        return "one";
+        return "1";
       case Phase.Second:
-        return "two";
+        return "2";
       default:
         return undefined;
     }
   }, [phase]);
+
+  const bgcolor = useMemo(()=>{
+    if (timeRemaining === 0) {
+      return '#fc0';
+    }
+
+    return phase === undefined ? "#c00" : "#0c0";
+  },[phase, timeRemaining]);
 
   useEffect(() => {
     if (endTime) {
@@ -62,8 +72,8 @@ export function Tortilla() {
   }, [playAlert, timeRemaining]);
 
   return (
-    <Box
-      border={`1px solid ${phase === undefined ? "#c00" : "#0c0"}`}
+    <Stack
+      bgcolor={bgcolor}
       width={160}
       height={160}
       borderRadius="100%"
@@ -81,7 +91,16 @@ export function Tortilla() {
         }
       }}
     >
-      {side ? `Side ${side}:` : null} {formattedTimeRemaining}
-    </Box>
+      {formattedTimeRemaining !== undefined ? (
+        <Typography variant="h2" component="span" color={palette.common.white}>
+          {formattedTimeRemaining}
+        </Typography>
+      ) : null}
+      {side !== undefined ? (
+        <Typography variant="h5" component="span" color={palette.common.white}>
+          Side {side}
+        </Typography>
+      ) : null}
+    </Stack>
   );
 }
