@@ -2,11 +2,14 @@ import { Box, Stack, Typography, useTheme } from "@material-ui/core";
 import React, { useEffect, useMemo, useState } from "react";
 import useSound from "use-sound";
 import alertSound from "./alert.mp3";
+import RefreshIcon from "@material-ui/icons/Refresh";
 
 enum Phase {
   First,
   Second,
 }
+
+const debugMode = localStorage.getItem("debugMode");
 
 export function Tortilla() {
   const { palette } = useTheme();
@@ -19,19 +22,13 @@ export function Tortilla() {
   const endTime = useMemo(() => {
     switch (phase) {
       case Phase.First:
-        return Date.now() + 60000;
+        return Date.now() + (debugMode ? 2000 : 60000);
       case Phase.Second:
-        return Date.now() + 45000;
+        return Date.now() + (debugMode ? 2000 : 45000);
       default:
         return undefined;
     }
   }, [phase]);
-
-  const formattedTimeRemaining = useMemo(
-    () =>
-      timeRemaining === undefined ? undefined : Math.ceil(timeRemaining / 1000),
-    [timeRemaining]
-  );
 
   const side = useMemo(() => {
     switch (phase) {
@@ -44,13 +41,13 @@ export function Tortilla() {
     }
   }, [phase]);
 
-  const bgcolor = useMemo(()=>{
+  const bgcolor = useMemo(() => {
     if (timeRemaining === 0) {
-      return '#fc0';
+      return "#fc0";
     }
 
     return phase === undefined ? "#c00" : "#0c0";
-  },[phase, timeRemaining]);
+  }, [phase, timeRemaining]);
 
   useEffect(() => {
     if (endTime) {
@@ -91,16 +88,50 @@ export function Tortilla() {
         }
       }}
     >
-      {formattedTimeRemaining !== undefined ? (
-        <Typography variant="h2" component="span" color={palette.common.white}>
-          {formattedTimeRemaining}
-        </Typography>
-      ) : null}
+      <Countdown timeRemaining={timeRemaining} />
       {side !== undefined ? (
-        <Typography variant="h5" component="span" color={palette.common.white}>
+        <Typography
+          gutterBottom={false}
+          variant="h5"
+          component="span"
+          color={palette.common.white}
+        >
           Side {side}
         </Typography>
       ) : null}
     </Stack>
   );
+}
+
+type CountdownProps = {
+  timeRemaining?: number;
+};
+
+function Countdown(props: CountdownProps) {
+  const { timeRemaining } = props;
+
+  const { palette } = useTheme();
+
+  const formattedTimeRemaining = useMemo(
+    () =>
+      timeRemaining === undefined ? undefined : Math.ceil(timeRemaining / 1000),
+    [timeRemaining]
+  );
+
+  if (timeRemaining === 0) {
+    return (
+      <RefreshIcon sx={{ fontSize: "4em", color: palette.common.white }} />
+    );
+  }
+
+  return formattedTimeRemaining !== undefined ? (
+    <Typography
+      gutterBottom={false}
+      variant="h2"
+      component="span"
+      color={palette.common.white}
+    >
+      {formattedTimeRemaining}
+    </Typography>
+  ) : null;
 }
